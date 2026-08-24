@@ -1,0 +1,11 @@
+{
+  "mode": "auto",
+  "title": "",
+  "series": "观点拆解",
+  "speaker": "",
+  "accent": "#FFD83D",
+  "keywords": [],
+  "silence_threshold_seconds": 0.85,
+  "cover_time_seconds": null,
+  "model": "small"
+}

@@ -1,0 +1,13 @@
+{
+  "name": "video-production-workflow",
+  "private": true,
+  "type": "module",
+  "scripts": {
+    "dev": "PATH=./bin:$PATH npx --yes hyperframes@0.8.10 preview",
+    "check": "PATH=./bin:$PATH npx --yes hyperframes@0.8.10 check",
+    "render": "PATH=./bin:$PATH npx --yes hyperframes@0.8.10 render",
+    "publish": "npx --yes hyperframes@0.8.10 publish",
+    "make": "bash scripts/run.sh",
+    "app": "bash scripts/run_app.sh"
+  }
+}

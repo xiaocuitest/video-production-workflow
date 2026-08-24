@@ -1,0 +1,941 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>成片工坊｜口播视频一键包装</title>
+  <script>
+    if (window.location.protocol === 'file:') {
+      window.location.replace('http://127.0.0.1:5088/');
+    }
+  </script>
+  <style>
+    :root { --ink:#151515; --muted:#6f706b; --paper:#f4f2ea; --card:#fffefa; --line:#dedbd0; --yellow:#ffd83d; --green:#1f7a54; --red:#b43a35; --shadow:0 18px 60px rgba(34,31,19,.09); --ui-primary:#1677FF; --ui-primary-50:#E6F4FF; --ui-primary-600:#0958D9; --ui-title:#1D2129; --ui-text:#4E5969; --ui-muted:#86909C; --ui-border:#E5E6EB; --ui-neutral-100:#F7F8FA; --ui-neutral-250:#F2F3F5; --ui-surface:#FFFFFF; --ui-page:#F5F5F5; --ui-success:#00B42A; --ui-warning:#FF7D00; --ui-danger:#F53F3F; --ui-shadow-md:0 2px 8px 0 rgba(0,0,0,.06); --ui-shadow-focus:0 0 0 4px rgba(22,119,255,.15); }
+    * { box-sizing:border-box; }
+    html { scroll-behavior:smooth; }
+    body { margin:0; color:var(--ink); background:radial-gradient(circle at 92% 4%,rgba(255,216,61,.25),transparent 25rem),var(--paper); font-family:"PingFang SC","Microsoft YaHei",system-ui,sans-serif; }
+    button,input,select { font:inherit; }
+    button { cursor:pointer; }
+    .shell { width:min(1760px,calc(100% - 48px)); margin:0 auto; }
+    header { padding:28px 0 20px; display:flex; align-items:center; justify-content:space-between; gap:24px; }
+    .brand { display:flex; align-items:center; gap:13px; }
+    .brand-mark { width:43px; height:43px; border-radius:14px; background:var(--ink); position:relative; box-shadow:6px 6px 0 var(--yellow); }
+    .brand-mark::before,.brand-mark::after { content:""; position:absolute; background:var(--yellow); border-radius:8px; }
+    .brand-mark::before { width:22px; height:6px; left:10px; top:12px; }
+    .brand-mark::after { width:14px; height:6px; left:10px; top:24px; }
+    .brand strong { display:block; font-size:22px; letter-spacing:.03em; }
+    .brand small { display:block; color:var(--muted); margin-top:2px; }
+    .privacy { display:flex; align-items:center; gap:8px; color:var(--muted); font-size:14px; }
+    .privacy i { width:9px; height:9px; background:#49a675; border-radius:50%; box-shadow:0 0 0 4px rgba(73,166,117,.12); }
+    .hero { padding:42px 0 30px; max-width:820px; }
+    .eyebrow { display:inline-flex; align-items:center; gap:9px; font-weight:700; font-size:14px; letter-spacing:.08em; }
+    .eyebrow::before { content:""; width:34px; height:7px; border-radius:9px; background:var(--yellow); }
+    h1 { font-size:clamp(38px,5vw,66px); line-height:1.08; letter-spacing:-.045em; margin:19px 0 16px; }
+    .hero p { margin:0; color:var(--muted); font-size:18px; line-height:1.75; }
+    .steps { display:grid; grid-template-columns:repeat(5,1fr); background:rgba(255,255,255,.58); border:1px solid rgba(222,219,208,.85); border-radius:20px; padding:8px; margin:12px 0 28px; backdrop-filter:blur(10px); }
+    .step { display:flex; align-items:center; gap:12px; padding:14px 16px; color:#8a8b85; border-radius:14px; }
+    .step b { display:grid; place-items:center; width:31px; height:31px; border:1px solid var(--line); border-radius:10px; background:#fff; color:var(--ink); }
+    .step.active { background:var(--ink); color:white; }
+    .step.active b { background:var(--yellow); border-color:var(--yellow); }
+    .workspace { display:grid; grid-template-columns:minmax(520px,.72fr) minmax(800px,1.28fr); gap:24px; align-items:start; padding-bottom:80px; }
+    .panel { background:var(--card); border:1px solid var(--line); border-radius:26px; box-shadow:var(--shadow); overflow:hidden; }
+    .section { padding:28px; border-bottom:1px solid #ebe8df; }
+    .section:last-child { border-bottom:0; }
+    .section-head { display:flex; align-items:flex-start; gap:14px; margin-bottom:20px; }
+    .number { flex:0 0 auto; width:34px; height:34px; display:grid; place-items:center; border-radius:11px; background:var(--ink); color:var(--yellow); font-weight:800; }
+    .section h2 { margin:0; font-size:21px; }
+    .section-head p { margin:5px 0 0; color:var(--muted); font-size:14px; }
+    .dropzone { border:2px dashed #c9c4b4; border-radius:20px; min-height:188px; padding:24px; display:flex; align-items:center; justify-content:center; text-align:center; background:linear-gradient(145deg,#fff,#faf8ef); transition:.2s ease; position:relative; }
+    .dropzone.drag,.dropzone:hover { border-color:#ad8d00; background:#fffced; transform:translateY(-1px); }
+    .dropzone input { position:absolute; inset:0; opacity:0; cursor:pointer; width:100%; }
+    .upload-icon { width:56px; height:56px; display:grid; place-items:center; border-radius:17px; background:var(--yellow); margin:0 auto 13px; font-size:28px; font-weight:900; }
+    .dropzone strong { font-size:18px; }
+    .dropzone span { display:block; margin-top:7px; color:var(--muted); font-size:14px; }
+    .file-picked { display:none; width:100%; text-align:left; align-items:center; gap:15px; }
+    .file-picked.show { display:flex; }
+    .file-thumb { width:68px; height:94px; border-radius:12px; background:#191919; object-fit:cover; }
+    .file-meta { min-width:0; flex:1; }
+    .file-meta strong { display:block; white-space:nowrap; text-overflow:ellipsis; overflow:hidden; }
+    .file-meta span { margin-top:5px; }
+    .change { border:1px solid var(--line); border-radius:10px; padding:8px 12px; background:white; font-size:13px; }
+    .modes { display:grid; grid-template-columns:repeat(3,1fr); gap:10px; }
+    .mode { position:relative; border:1px solid var(--line); border-radius:16px; padding:16px; min-height:122px; transition:.18s ease; }
+    .mode input { position:absolute; opacity:0; }
+    .mode:has(input:checked) { border:2px solid var(--ink); padding:15px; background:#fffbea; box-shadow:inset 0 0 0 3px var(--yellow); }
+    .mode strong { display:block; margin-bottom:7px; }
+    .mode span { color:var(--muted); font-size:13px; line-height:1.55; }
+    .badge { display:inline-flex!important; color:#6d5700!important; background:var(--yellow); border-radius:999px; padding:2px 7px; font-weight:700; font-size:11px!important; margin-bottom:8px; }
+    .template-auto { display:flex; align-items:flex-start; gap:12px; padding:16px; margin-bottom:16px; border:1px solid var(--ui-border); border-radius:8px; background:var(--ui-surface); box-shadow:var(--ui-shadow-md); cursor:pointer; transition:.2s ease-in-out; }
+    .template-auto:has(input:checked) { border-color:var(--ui-primary); background:var(--ui-primary-50); box-shadow:var(--ui-shadow-focus); }
+    .template-auto input { width:16px; height:16px; margin:4px 0 0; accent-color:var(--ui-primary); }
+    .template-auto b { display:block; color:var(--ui-title); font-size:14px; font-weight:600; }
+    .template-auto small { display:block; margin-top:4px; color:var(--ui-text); font-size:12px; line-height:20px; }
+    .template-grid { display:grid; grid-template-columns:repeat(2,minmax(0,1fr)); gap:16px; }
+    .template-card { position:relative; display:flex; flex-direction:column; min-width:0; padding:16px; border:1px solid var(--ui-border); border-radius:8px; background:var(--ui-surface); box-shadow:var(--ui-shadow-md); cursor:pointer; transition:.2s ease-in-out; }
+    .template-card:hover { border-color:#C9CDD4; transform:translateY(-2px); box-shadow:0 4px 16px 0 rgba(0,0,0,.08); }
+    .template-card:has(input:focus-visible) { box-shadow:var(--ui-shadow-focus); }
+    .template-card:has(input:checked) { padding:15px; border:2px solid var(--ui-primary); background:linear-gradient(180deg,var(--ui-primary-50),var(--ui-surface) 36%); box-shadow:var(--ui-shadow-focus); }
+    .template-card > input { position:absolute; width:1px; height:1px; opacity:0; }
+    .template-select-mark { position:absolute; z-index:5; top:24px; right:24px; display:grid; place-items:center; width:24px; height:24px; border:1px solid rgba(255,255,255,.72); border-radius:999px; background:rgba(29,33,41,.56); color:transparent; font-size:12px; font-weight:700; backdrop-filter:blur(8px); transition:.2s ease-in-out; }
+    .template-card:has(input:checked) .template-select-mark { border-color:var(--ui-primary); background:var(--ui-primary); color:var(--ui-surface); }
+    .template-poster { position:relative; aspect-ratio:16/10; overflow:hidden; border-radius:6px; background:var(--ui-title); color:var(--ui-surface); isolation:isolate; }
+    .template-poster::before { content:""; position:absolute; inset:0; z-index:-2; background:radial-gradient(circle at 82% 18%,rgba(22,119,255,.32),transparent 34%),linear-gradient(145deg,#272E3B,#1D2129 68%); }
+    .template-poster::after { content:""; position:absolute; inset:0; z-index:4; pointer-events:none; background:linear-gradient(180deg,rgba(255,255,255,.06),transparent 32%,rgba(0,0,0,.18)); }
+    .preview-chrome { position:absolute; z-index:3; top:12px; left:12px; right:12px; display:flex; align-items:center; gap:8px; height:20px; color:rgba(255,255,255,.70); font:500 9px/20px "SF Mono","Menlo",monospace; letter-spacing:.08em; text-transform:uppercase; }
+    .preview-chrome::before { content:""; width:6px; height:6px; border-radius:999px; background:var(--ui-primary); box-shadow:0 0 0 4px rgba(22,119,255,.18); }
+    .preview-chrome b { margin-left:auto; color:rgba(255,255,255,.82); font-weight:500; }
+    .preview-speaker { position:absolute; z-index:1; right:5%; bottom:-18%; width:30%; height:82%; overflow:hidden; border:1px solid rgba(255,255,255,.18); border-radius:56px 56px 8px 8px; background:linear-gradient(90deg,#4E5969,#86909C 48%,#272E3B); box-shadow:0 16px 32px rgba(0,0,0,.28); }
+    .preview-speaker::before { content:""; position:absolute; top:12%; left:50%; width:40%; aspect-ratio:1; transform:translateX(-50%); border-radius:999px; background:linear-gradient(145deg,#F7F8FA,#C9CDD4); }
+    .preview-speaker::after { content:""; position:absolute; left:18%; right:18%; bottom:-4%; height:58%; border-radius:999px 999px 8px 8px; background:linear-gradient(90deg,#272E3B,#4E5969 52%,#1D2129); }
+    .preview-copy { position:absolute; z-index:2; left:7%; top:30%; width:62%; }
+    .preview-copy small { display:block; margin-bottom:8px; color:#91CAFF; font:600 9px/1 "SF Mono","Menlo",monospace; letter-spacing:.08em; }
+    .preview-copy b { display:block; font-size:15px; line-height:1.28; font-weight:600; letter-spacing:-.02em; }
+    .preview-copy span { display:inline-flex; align-items:center; height:20px; margin-top:12px; padding:0 8px; border-radius:4px; background:rgba(22,119,255,.20); color:#BAE0FF; font-size:9px; font-weight:600; }
+    .demo-caption { position:absolute; z-index:3; left:7%; bottom:9%; max-width:58%; overflow:hidden; color:rgba(255,255,255,.86); font-size:9px; line-height:20px; text-overflow:ellipsis; white-space:nowrap; }
+    .demo-caption mark { padding:2px 4px; border-radius:2px; background:var(--ui-primary); color:var(--ui-surface); }
+    .template-card .demo-caption { display:none; }
+    .conflict-panels { position:absolute; z-index:2; left:7%; right:7%; top:29%; bottom:18%; display:grid; grid-template-columns:1fr 1fr; gap:8px; }
+    .conflict-panels div { display:flex; flex-direction:column; justify-content:flex-end; padding:12px; border:1px solid rgba(255,255,255,.16); border-radius:6px; background:rgba(29,33,41,.74); backdrop-filter:blur(6px); }
+    .conflict-panels div:last-child { border-color:#91CAFF; background:linear-gradient(145deg,var(--ui-primary-600),var(--ui-primary)); }
+    .conflict-panels small { color:rgba(255,255,255,.68); font-size:9px; }
+    .conflict-panels b { margin-top:4px; font-size:20px; line-height:1; }
+    .story-collage { position:absolute; z-index:1; inset:25% 7% 16%; display:grid; grid-template-columns:1.25fr .75fr; grid-template-rows:1fr 1fr; gap:8px; }
+    .story-collage span { position:relative; overflow:hidden; border-radius:6px; background:linear-gradient(145deg,#86909C,#4E5969); }
+    .story-collage span:first-child { grid-row:1/3; background:linear-gradient(145deg,#BAE0FF,#3491FA); }
+    .story-collage span:nth-child(2) { background:linear-gradient(145deg,#E8FFEA,#00B42A); }
+    .story-collage span:nth-child(3) { background:linear-gradient(145deg,#FFF7E8,#FF7D00); }
+    .story-collage span::after { content:""; position:absolute; inset:auto 8px 8px; height:4px; border-radius:2px; background:rgba(255,255,255,.72); box-shadow:0 -8px 0 rgba(255,255,255,.36); }
+    .story-label { position:absolute; z-index:3; left:10%; bottom:8%; padding:4px 8px; border-radius:4px; background:var(--ui-title); color:var(--ui-surface); font-size:9px; font-weight:600; }
+    .template-poster[data-template="editorial"]::before { background:radial-gradient(circle at 15% 22%,rgba(22,119,255,.26),transparent 28%),linear-gradient(145deg,#F7F8FA,#C9CDD4); }
+    .editorial-title { position:absolute; z-index:2; left:7%; top:32%; color:var(--ui-title); }
+    .editorial-title small { display:block; margin-bottom:8px; color:var(--ui-primary-600); font:600 9px/1 "SF Mono","Menlo",monospace; }
+    .editorial-title b { display:block; font-size:20px; line-height:1; letter-spacing:-.04em; }
+    .editorial-card { position:absolute; z-index:2; right:5%; top:30%; width:44%; padding:12px; border-radius:6px; background:rgba(255,255,255,.86); color:var(--ui-title); box-shadow:0 4px 16px rgba(0,0,0,.08); backdrop-filter:blur(8px); }
+    .editorial-card span { display:block; height:4px; border-radius:2px; background:var(--ui-primary); box-shadow:0 10px 0 var(--ui-border),0 20px 0 var(--ui-border); }
+    .editorial-pip { position:absolute; z-index:3; right:10%; bottom:12%; width:34px; height:34px; border:2px solid var(--ui-surface); border-radius:999px; background:linear-gradient(145deg,#86909C,#272E3B); box-shadow:0 2px 8px rgba(0,0,0,.16); }
+    .template-card-copy { padding:16px 0 12px; flex:1; }
+    .template-title-row { display:flex; align-items:center; justify-content:space-between; gap:8px; }
+    .template-title-row strong { min-width:0; overflow:hidden; color:var(--ui-title); font-size:17px; line-height:24px; font-weight:600; text-overflow:ellipsis; white-space:nowrap; }
+    .template-title-row span { flex:0 0 auto; display:inline-flex; align-items:center; height:22px; padding:0 8px; border-radius:4px; background:var(--ui-neutral-250); color:var(--ui-text); font-size:12px; }
+    .template-specs { display:flex; gap:8px; margin-top:8px; overflow:hidden; }
+    .template-specs span { min-width:0; overflow:hidden; color:var(--ui-primary-600); font-size:12px; line-height:20px; font-weight:500; text-overflow:ellipsis; white-space:nowrap; }
+    .template-specs span + span { padding-left:8px; border-left:1px solid var(--ui-border); color:var(--ui-muted); }
+    .template-card-copy p { display:-webkit-box; min-height:40px; margin:8px 0 0; overflow:hidden; color:var(--ui-text); font-size:12px; line-height:20px; -webkit-box-orient:vertical; -webkit-line-clamp:2; }
+    .template-demo-btn { display:flex; align-items:center; justify-content:center; gap:8px; height:32px; padding:0 16px; border:1px solid var(--ui-border); border-radius:4px; background:var(--ui-surface); color:var(--ui-text); font-size:13px; font-weight:500; transition:.15s ease-in-out; }
+    .template-demo-btn:hover { border-color:var(--ui-primary); background:var(--ui-primary-50); color:var(--ui-primary); }
+    .template-demo-btn i { font-style:normal; font-size:14px; }
+    .scene-pack { margin-top:20px; padding:20px; border:1px solid var(--line); border-radius:16px; background:linear-gradient(145deg,#f7f5ed,#fffefa); }
+    .scene-pack-head { display:flex; align-items:flex-start; justify-content:space-between; gap:16px; }
+    .scene-pack-head > div { min-width:0; }
+    .scene-pack-eyebrow { display:block; margin-bottom:4px; color:#8a7000; font-size:11px; font-weight:800; letter-spacing:.08em; }
+    .scene-pack-head h3 { margin:0; font-size:17px; line-height:1.4; }
+    .scene-pack-head p { margin:4px 0 0; color:var(--muted); font-size:12px; line-height:1.55; }
+    .scene-pack-status { flex:0 0 auto; padding:4px 8px; border-radius:999px; background:#eceae2; color:#666; font-size:11px; font-weight:800; }
+    .scene-pack-status.on { background:#fff1a8; color:#725b00; }
+    .scene-pack-status.ready { background:#dff3e8; color:#176642; }
+    .scene-pack-switch { display:flex; align-items:flex-start; gap:12px; margin-top:16px; padding:12px 16px; border:1px solid #e5e2d8; border-radius:12px; background:white; cursor:pointer; }
+    .scene-pack-switch:has(input:checked) { border-color:#e5cf62; background:#fffbea; box-shadow:inset 0 0 0 2px rgba(255,216,61,.45); }
+    .scene-pack-switch input { flex:0 0 auto; width:18px; height:18px; margin:2px 0 0; accent-color:var(--ink); }
+    .scene-pack-switch b { display:block; color:#272e3b; font-size:14px; }
+    .scene-pack-switch small { display:block; margin-top:4px; color:var(--muted); font-size:12px; line-height:1.55; }
+    .scene-pack-source { display:flex; align-items:center; justify-content:space-between; gap:12px; margin-top:12px; padding:8px 12px; border-left:3px solid #c9c4b4; border-radius:4px; background:white; }
+    .scene-pack-source.on { border-left-color:var(--yellow); }
+    .scene-pack-source.ready { border-left-color:var(--green); }
+    .scene-pack-source span { color:#4e5969; font-size:11px; line-height:1.55; }
+    .scene-pack-source button { flex:0 0 auto; border:1px solid var(--line); border-radius:4px; background:#fff; padding:8px 12px; color:#272e3b; font-size:11px; font-weight:700; }
+    .scene-roles { margin-top:16px; padding-top:16px; border-top:1px solid #e5e2d8; }
+    .scene-roles-head { display:flex; align-items:flex-end; justify-content:space-between; gap:12px; margin-bottom:12px; }
+    .scene-roles-head b { font-size:13px; }
+    .scene-roles-head span { color:var(--muted); font-size:11px; }
+    .scene-role-grid { display:grid; grid-template-columns:repeat(5,minmax(0,1fr)); gap:8px; }
+    .scene-role { min-width:0; padding:8px; border:1px solid #e5e2d8; border-radius:8px; background:white; }
+    .scene-role-visual { position:relative; height:62px; overflow:hidden; border-radius:6px; background:#2d2f2b; }
+    .scene-role-visual::before,.scene-role-visual::after { content:""; position:absolute; }
+    .scene-role-visual.person::before { left:50%; top:12px; width:18px; height:18px; transform:translateX(-50%); border-radius:50%; background:#d2b39b; }
+    .scene-role-visual.person::after { left:50%; bottom:-8px; width:42px; height:38px; transform:translateX(-50%); border-radius:20px 20px 6px 6px; background:#8d9188; }
+    .scene-role-visual.media { background:linear-gradient(145deg,#79966f 0 50%,#c98669 50%); }
+    .scene-role-visual.media::before { right:6px; bottom:6px; width:22px; height:22px; border:2px solid white; border-radius:50%; background:#353733; }
+    .scene-role-visual.concept::before { inset:9px; border:1px solid rgba(255,255,255,.48); border-left:3px solid var(--yellow); border-radius:4px; background:rgba(10,11,10,.64); }
+    .scene-role-visual.concept::after { left:18px; right:18px; top:26px; height:4px; border-radius:4px; background:var(--yellow); box-shadow:0 9px 0 rgba(255,255,255,.72); }
+    .scene-role-visual.summary::before { inset:8px; border-radius:4px; background:#f5f1e5; }
+    .scene-role-visual.summary::after { left:16px; right:16px; top:20px; height:4px; border-radius:4px; background:#272824; box-shadow:0 9px 0 #c8a800,0 18px 0 #bbb8ae; }
+    .scene-role-visual.chapter { background:var(--yellow); }
+    .scene-role-visual.chapter::before { left:10px; top:12px; width:22px; height:4px; border-radius:4px; background:#171816; }
+    .scene-role-visual.chapter::after { left:10px; right:10px; bottom:14px; height:12px; border-top:4px solid #171816; border-bottom:4px solid #171816; }
+    .scene-role b { display:block; overflow:hidden; margin-top:7px; font-size:11px; line-height:1.35; text-overflow:ellipsis; white-space:nowrap; }
+    .scene-role small { display:block; margin-top:2px; color:#86909c; font-size:9px; line-height:1.4; }
+    dialog { width:min(900px,calc(100% - 28px)); border:0; padding:0; border-radius:24px; box-shadow:0 30px 100px rgba(0,0,0,.34); background:#f7f5ee; }
+    dialog::backdrop { background:rgba(15,15,13,.72); backdrop-filter:blur(5px); }
+    .demo-modal { display:grid; grid-template-columns:380px 1fr; min-height:560px; }
+    .demo-modal-visual { padding:24px; background:var(--ui-title); display:grid; place-items:center; }
+    .demo-modal-visual .template-poster { width:100%; aspect-ratio:16/10; box-shadow:0 8px 24px rgba(0,0,0,.10); }
+    .demo-modal-visual .preview-copy b { font-size:24px; }
+    .demo-modal-visual .conflict-panels b { font-size:24px; }
+    .demo-modal-visual .editorial-title b { font-size:32px; }
+    .demo-modal-visual .demo-caption { display:block; font-size:11px; }
+    .demo-modal-copy { padding:34px; position:relative; }
+    .demo-close { position:absolute; right:20px; top:18px; width:36px; height:36px; border:0; border-radius:50%; background:#e6e3d9; font-size:20px; }
+    .demo-modal-copy .eyebrow { font-size:12px; }
+    .demo-modal-copy h3 { margin:18px 0 8px; font-size:30px; }
+    .demo-modal-copy > p { color:var(--muted); line-height:1.7; margin:0 0 22px; }
+    .demo-feature-list { display:grid; grid-template-columns:1fr 1fr; gap:8px; margin:0 0 24px; padding:0; list-style:none; }
+    .demo-feature-list li { padding:10px 12px; border-radius:10px; background:white; border:1px solid var(--line); font-size:12px; font-weight:700; }
+    .demo-timeline { border-top:1px solid var(--line); padding-top:18px; }
+    .demo-beat { display:grid; grid-template-columns:28px 1fr; gap:11px; margin-top:13px; }
+    .demo-beat b { display:grid; place-items:center; width:28px; height:28px; border-radius:9px; background:var(--ink); color:var(--yellow); font-size:12px; }
+    .demo-beat span { color:#555650; font-size:13px; line-height:1.55; }
+    .fields { display:grid; grid-template-columns:1fr 1fr; gap:14px; }
+    .field.full { grid-column:1/-1; }
+    label.field > span { display:block; font-size:13px; font-weight:700; margin-bottom:8px; }
+    .field input[type="text"],.field input[type="password"],.field select { width:100%; border:1px solid var(--line); border-radius:12px; background:white; padding:13px 14px; outline:none; }
+    .field input[type="text"]:focus,.field input[type="password"]:focus,.field select:focus { border-color:#a98b00; box-shadow:0 0 0 3px rgba(255,216,61,.28); }
+    .color-row { display:flex; gap:10px; align-items:center; }
+    input[type="color"] { width:49px; height:45px; border:1px solid var(--line); padding:4px; border-radius:12px; background:white; }
+    details { margin-top:16px; border:1px solid var(--line); border-radius:14px; background:#fbfaf6; }
+    summary { padding:14px 16px; cursor:pointer; font-weight:700; font-size:14px; }
+    .advanced { padding:2px 16px 17px; }
+    .image-drop { position:relative; border:1px dashed #bbb6a8; border-radius:14px; padding:15px; text-align:center; color:var(--muted); font-size:13px; }
+    .image-drop input { position:absolute; inset:0; opacity:0; width:100%; cursor:pointer; }
+    .image-list { display:flex; gap:8px; margin-top:10px; overflow:auto; }
+    .image-list img { width:58px; height:58px; object-fit:cover; border-radius:10px; border:1px solid var(--line); }
+    .media-chip { width:74px; min-width:74px; height:66px; border-radius:10px; border:1px solid var(--line); background:#fff; display:grid; place-items:center; padding:6px; color:var(--muted); font-size:10px; overflow:hidden; text-align:center; }
+    .media-chip img,.media-chip video { width:100%; height:100%; object-fit:cover; border-radius:6px; }
+    .music-row { margin-top:16px; padding:16px; border-radius:14px; background:#f7f5ed; border:1px solid var(--line); }
+    .music-row > strong { display:block; margin-bottom:11px; font-size:14px; }
+    .music-options { display:grid; grid-template-columns:repeat(3,1fr); gap:8px; }
+    .music-option { position:relative; padding:11px; border:1px solid var(--line); border-radius:11px; background:#fff; font-size:12px; color:var(--muted); }
+    .music-option input { margin-right:5px; accent-color:var(--ink); }
+    .music-option:has(input:checked) { border-color:var(--ink); color:var(--ink); background:#fffbea; }
+    .bgm-upload { display:none; margin-top:12px; width:100%; }
+    .bgm-upload.show { display:block; }
+    .toggle-row { display:flex; gap:12px; align-items:flex-start; margin-top:15px; padding:14px; border:1px solid var(--line); border-radius:12px; background:white; }
+    .toggle-row input { margin-top:3px; accent-color:var(--ink); }
+    .toggle-row b { display:block; font-size:13px; }
+    .toggle-row small { display:block; color:var(--muted); line-height:1.55; margin-top:4px; }
+    .provider-fields { display:none; margin-top:12px; }
+    .provider-fields.show { display:grid; }
+    .credential-vault { display:flex; align-items:flex-start; justify-content:space-between; gap:16px; padding:15px 16px; border:1px solid #d8cf9f; border-radius:13px; background:#fffbea; }
+    .credential-vault-copy { display:flex; gap:11px; align-items:flex-start; }
+    .credential-vault-icon { display:grid; place-items:center; flex:0 0 34px; width:34px; height:34px; border-radius:10px; background:var(--ink); color:var(--yellow); font-size:17px; }
+    .credential-vault b { display:block; font-size:13px; }
+    .credential-vault small { display:block; max-width:510px; margin-top:4px; color:var(--muted); font-size:11px; line-height:1.55; }
+    .credential-state { flex:0 0 auto; padding:6px 9px; border-radius:999px; background:#eceae2; color:#666; font-size:11px; font-weight:800; white-space:nowrap; }
+    .credential-state.ready { background:#dff3e8; color:#176642; }
+    .credential-badge { float:right; padding:3px 7px; border-radius:999px; background:#eceae2; color:#777; font-size:10px; font-style:normal; font-weight:800; }
+    .credential-badge.ready { background:#dff3e8; color:#176642; }
+    .credential-actions { display:flex; align-items:center; gap:9px; flex-wrap:wrap; }
+    .credential-actions button { border:1px solid var(--ink); border-radius:10px; padding:10px 13px; background:var(--ink); color:white; font-size:12px; font-weight:800; cursor:pointer; }
+    .credential-actions button.secondary { border-color:var(--line); background:white; color:#555; }
+    .credential-actions button:disabled { opacity:.42; cursor:not-allowed; }
+    .credential-actions small { flex:1 1 100%; color:var(--muted); font-size:11px; line-height:1.55; }
+    .submit-area { padding:24px 28px 28px; background:#faf8f0; }
+    .primary { border:0; width:100%; padding:17px 22px; border-radius:14px; background:var(--ink); color:white; font-weight:800; font-size:17px; box-shadow:0 7px 0 #a88e24; transition:.15s ease; }
+    .primary:hover { transform:translateY(-2px); box-shadow:0 9px 0 #a88e24; }
+    .primary:disabled { opacity:.48; cursor:not-allowed; transform:none; box-shadow:none; }
+    .submit-area p { color:var(--muted); text-align:center; font-size:12px; margin:14px 0 0; }
+    .result-panel { position:sticky; top:20px; min-width:0; }
+    .result-top { padding:25px 25px 20px; display:flex; align-items:center; justify-content:space-between; }
+    .result-top h2 { margin:0; font-size:20px; }
+    .status-pill { border-radius:999px; padding:6px 10px; background:#eceae2; color:#666; font-size:12px; font-weight:700; }
+    .status-pill.working { background:#fff1a8; color:#725b00; }
+    .status-pill.ready { background:#dff3e8; color:#176642; }
+    .status-pill.error { background:#fae2df; color:#9e2f2a; }
+    .agent-flow { margin:0 25px 20px; padding:16px; border:1px solid var(--line); border-radius:16px; background:#f8f6ef; }
+    .agent-flow-head { display:flex; align-items:flex-start; justify-content:space-between; gap:12px; margin-bottom:12px; }
+    .agent-flow-kicker { display:block; margin-bottom:4px; color:#8a7000; font-size:11px; font-weight:800; letter-spacing:.08em; }
+    .agent-flow-head h3 { margin:0; font-size:17px; line-height:1.4; }
+    .agent-flow-head p { margin:4px 0 0; color:var(--muted); font-size:12px; line-height:1.5; }
+    .agent-flow-state { flex:0 0 auto; min-width:64px; padding:4px 8px; border-radius:999px; background:#eceae2; color:#666; text-align:center; font-size:11px; font-weight:800; }
+    .agent-flow-state.working { background:#fff1a8; color:#725b00; }
+    .agent-flow-state.ready { background:#dff3e8; color:#176642; }
+    .agent-flow-state.error { background:#fae2df; color:#9e2f2a; }
+    .agent-grid { display:grid; grid-template-columns:1fr 1fr; gap:8px; }
+    .agent-card { min-width:0; display:grid; grid-template-columns:28px minmax(0,1fr) auto; align-items:center; gap:8px; min-height:52px; padding:8px; border:1px solid #e5e2d8; border-radius:8px; background:white; transition:.2s ease-in-out; }
+    .agent-card .agent-index { display:grid; place-items:center; width:28px; height:28px; border-radius:8px; background:#f2f0e8; color:#777871; font:600 11px/1 ui-monospace,monospace; }
+    .agent-card-copy { min-width:0; }
+    .agent-card b { display:block; overflow:hidden; color:#272e3b; font-size:12px; line-height:1.35; text-overflow:ellipsis; white-space:nowrap; }
+    .agent-card small { display:block; overflow:hidden; margin-top:2px; color:#86909c; font-size:10px; line-height:1.35; text-overflow:ellipsis; white-space:nowrap; }
+    .agent-card .agent-status { width:8px; height:8px; border-radius:999px; background:#c9cdd4; box-shadow:0 0 0 3px #f2f3f5; }
+    .agent-card.active { border-color:#e5cf62; background:#fffbea; box-shadow:0 2px 8px rgba(34,31,19,.06); }
+    .agent-card.active .agent-index { background:var(--yellow); color:#171816; }
+    .agent-card.active .agent-status { background:#ffb400; box-shadow:0 0 0 3px #fff1a8; animation:agentPulse 1.35s ease-in-out infinite; }
+    .agent-card.done .agent-index { background:#dff3e8; color:#176642; }
+    .agent-card.done .agent-status { background:#1f7a54; box-shadow:0 0 0 3px #dff3e8; }
+    .agent-card.error { border-color:#ecc4c0; background:#fff6f5; }
+    .agent-card.error .agent-index { background:#fae2df; color:#9e2f2a; }
+    .agent-card.error .agent-status { background:#b43a35; box-shadow:0 0 0 3px #fae2df; }
+    .agent-card.skipped { opacity:.64; }
+    .agent-card.skipped .agent-status { background:#86909c; box-shadow:none; }
+    .agent-focus { display:flex; align-items:flex-start; gap:8px; margin-top:12px; padding:8px 12px; border-left:3px solid var(--yellow); border-radius:4px; background:#fff; color:#4e5969; font-size:11px; line-height:1.55; }
+    .agent-focus b { flex:0 0 auto; color:#1d2129; }
+    @keyframes agentPulse { 50% { transform:scale(.75); opacity:.55; } }
+    .stage { margin:0 25px 25px; min-height:620px; border-radius:20px; background:#171816; overflow:hidden; position:relative; display:grid; place-items:center; }
+    .empty { color:white; text-align:center; max-width:270px; padding:30px; }
+    .empty .phone { width:86px; height:151px; border:3px solid #64655f; border-radius:19px; margin:0 auto 20px; position:relative; }
+    .empty .phone::before { content:""; position:absolute; left:50%; top:9px; width:24px; height:5px; transform:translateX(-50%); background:#64655f; border-radius:5px; }
+    .empty strong { display:block; font-size:17px; }
+    .empty span { display:block; color:#aaa; margin-top:8px; line-height:1.6; font-size:13px; }
+    .processing { display:none; width:100%; color:white; padding:35px; }
+    .processing.show { display:block; }
+    .spinner { width:64px; height:64px; border:7px solid rgba(255,255,255,.14); border-top-color:var(--yellow); border-radius:50%; animation:spin 1s linear infinite; margin-bottom:24px; }
+    @keyframes spin { to { transform:rotate(360deg); } }
+    .processing h3 { margin:0 0 9px; font-size:23px; }
+    .processing p { color:#b8b9b3; min-height:22px; margin:0 0 24px; }
+    .bar { height:10px; border-radius:10px; background:#363733; overflow:hidden; }
+    .bar i { display:block; height:100%; width:0; background:var(--yellow); border-radius:10px; transition:width .45s ease; }
+    .percent { display:flex; justify-content:space-between; color:#9c9d97; font-size:12px; margin-top:9px; }
+    .ready-view { display:none; width:100%; height:100%; grid-template-columns:minmax(320px,46%) minmax(320px,54%); }
+    .ready-view.show { display:grid; }
+    .inline-preview-column { min-width:0; padding:24px 8px 24px 24px; display:flex; flex-direction:column; justify-content:center; }
+    .inline-preview-card { padding:16px; border:1px solid rgba(255,255,255,.12); border-radius:8px; background:#0e0f0d; box-shadow:0 8px 24px rgba(0,0,0,.10); }
+    .inline-preview-head { display:flex; align-items:flex-start; justify-content:space-between; gap:12px; margin-bottom:12px; }
+    .inline-preview-head b { display:block; color:#fff; font-size:17px; line-height:24px; }
+    .inline-preview-head small { display:block; margin-top:4px; color:#a9aaa4; font-size:12px; line-height:20px; }
+    .inline-live { flex:0 0 auto; padding:4px 8px; border-radius:4px; background:#E8FFEA; color:#00B42A; font:600 11px/20px "SF Mono",Menlo,monospace; }
+    .inline-preview-screen { position:relative; width:min(100%,330px); aspect-ratio:9/16; margin:0 auto; overflow:hidden; border-radius:8px; background:#050505; box-shadow:0 8px 24px rgba(0,0,0,.34); }
+    .inline-preview-screen hyperframes-player,.inline-preview-screen video { position:absolute; inset:0; width:100%; height:100%; border:0; object-fit:contain; background:#050505; }
+    .inline-preview-screen hyperframes-player { display:block; --hfp-accent:var(--yellow); }
+    .inline-preview-placeholder { position:absolute; inset:0; z-index:2; display:grid; place-items:center; padding:24px; background:#11120f; color:#c9cdd4; text-align:center; font-size:14px; line-height:22px; }
+    .inline-preview-placeholder[hidden] { display:none; }
+    .inline-preview-placeholder b { display:block; margin-bottom:8px; color:#fff; font-size:17px; }
+    .inline-preview-screen hyperframes-player[hidden],.inline-preview-screen video[hidden] { display:none; }
+    .preview-action-row { display:grid; grid-template-columns:1fr 1fr; gap:8px; margin-top:12px; }
+    .preview-action-row .secondary { height:40px; margin:0; padding:0 16px; border-radius:4px; font-size:14px; }
+    .editor-note { margin:8px 0 0; color:#86909C; font-size:11px; line-height:20px; text-align:center; }
+    .ready-copy { color:white; padding:28px 24px; display:flex; flex-direction:column; justify-content:center; }
+    .ready-copy small { color:var(--yellow); font-weight:800; letter-spacing:.08em; }
+    .ready-copy h3 { font-size:24px; line-height:1.25; margin:10px 0 16px; }
+    .metrics { display:grid; grid-template-columns:1fr 1fr; gap:8px; margin-bottom:18px; }
+    .metric { background:#292a27; border-radius:10px; padding:10px; }
+    .metric b { display:block; font-size:16px; }
+    .metric span { color:#aaa; font-size:11px; }
+    .secondary { width:100%; border:1px solid #555650; background:#272824; color:white; border-radius:11px; padding:11px 10px; font-weight:700; margin-top:8px; }
+    .secondary.accent { background:var(--yellow); color:#111; border-color:var(--yellow); }
+    .cover-picker { margin-top:16px; }
+    .cover-picker > b { display:block; font-size:13px; margin-bottom:9px; color:#ddd; }
+    .copy-summary { margin:13px 0 4px; padding:13px 14px; border:1px solid rgba(255,255,255,.14); border-radius:12px; background:rgba(255,255,255,.06); }
+    .copy-summary em { display:block; color:var(--yellow); font-size:11px; font-style:normal; letter-spacing:.08em; }
+    .copy-summary b { display:block; margin-top:5px; color:white; font-size:16px; line-height:1.35; }
+    .copy-summary p { margin:4px 0 0; color:#c9c9c4; font-size:12px; line-height:1.5; }
+    .copy-summary small { display:block; margin-top:7px; color:#9d9e98; line-height:1.45; }
+    .bgm-preview { margin:12px 0 4px; padding:11px 12px; border-radius:11px; background:#121310; border:1px solid rgba(255,216,61,.22); }
+    .bgm-preview b { display:block; margin-bottom:7px; color:#fff; font-size:12px; }
+    .bgm-preview audio { display:block; width:100%; height:34px; }
+    .bgm-preview small { display:block; margin-top:6px; color:#aaa; line-height:1.45; }
+    .motion-picker { margin:14px 0 4px; }
+    .motion-picker > b { display:flex; align-items:center; justify-content:space-between; gap:8px; font-size:13px; margin-bottom:9px; color:#eee; }
+    .motion-picker > b small { color:#969790; font-size:10px; font-weight:500; }
+    .motion-options { display:grid; gap:7px; }
+    .motion-choice { display:grid; grid-template-columns:54px 1fr auto; gap:10px; align-items:center; width:100%; border:1px solid #4d4e49; border-radius:12px; background:#242522; color:white; padding:7px; text-align:left; }
+    .motion-choice:hover { border-color:#85867f; }
+    .motion-choice.selected { border:2px solid var(--yellow); padding:6px; background:#38331e; }
+    .motion-demo { width:54px; height:76px; border-radius:8px; overflow:hidden; background-position:center; background-size:cover; position:relative; isolation:isolate; }
+    .motion-demo::before { content:""; position:absolute; inset:0; background:linear-gradient(180deg,rgba(0,0,0,.08),rgba(0,0,0,.45)); z-index:-1; }
+    .motion-demo i { position:absolute; display:block; background:rgba(12,13,13,.72); border:1px solid rgba(255,255,255,.42); }
+    .motion-demo.expert i { left:6px; right:6px; top:14px; height:23px; border-radius:4px; border-top:2px solid var(--yellow); }
+    .motion-demo.conflict i:first-child { left:5px; top:12px; width:20px; height:31px; border-radius:4px; background:#ece9df; }
+    .motion-demo.conflict i:last-child { right:5px; top:12px; width:20px; height:31px; border-radius:4px; background:var(--yellow); }
+    .motion-demo.story i { left:5px; right:5px; top:7px; height:37px; border-radius:5px; background:rgba(255,255,255,.25); backdrop-filter:blur(2px); }
+    .motion-copy strong { display:flex; align-items:center; gap:6px; font-size:12px; }
+    .motion-copy span { display:block; color:#aaa; font-size:10px; line-height:1.35; margin-top:3px; }
+    .recommended-tag { display:inline-flex; padding:2px 5px; border-radius:999px; background:var(--yellow); color:#282000; font-size:8px; font-weight:900; }
+    .motion-check { color:var(--yellow); font-size:16px; opacity:0; }
+    .motion-choice.selected .motion-check { opacity:1; }
+    .cover-options { display:grid; grid-template-columns:repeat(3,1fr); gap:7px; }
+    .cover-choice { border:1px solid #555650; border-radius:10px; background:#242522; padding:5px; color:white; text-align:left; }
+    .cover-choice img { display:block; width:100%; aspect-ratio:9/16; object-fit:cover; border-radius:6px; }
+    .cover-choice span { display:block; font-size:10px; line-height:1.25; margin-top:5px; text-align:center; }
+    .cover-choice.selected { border:2px solid var(--yellow); padding:4px; background:#3a3520; }
+    .cover-current { display:grid; grid-template-columns:54px minmax(0,1fr) auto; align-items:center; gap:12px; margin-top:12px; padding:8px; border:1px solid rgba(255,255,255,.14); border-radius:8px; background:rgba(255,255,255,.05); }
+    .cover-current img { width:54px; aspect-ratio:9/16; object-fit:cover; border-radius:4px; }
+    .cover-current b { display:block; color:#fff; font-size:12px; }
+    .cover-current span { display:block; margin-top:4px; color:#9d9e98; font-size:11px; line-height:1.45; }
+    .cover-current .secondary { width:auto; height:32px; margin:0; padding:0 12px; border-radius:4px; font-size:12px; text-decoration:none; display:inline-flex; align-items:center; }
+    .error-view { display:none; color:white; padding:35px; width:100%; }
+    .error-view.show { display:block; }
+    .error-view b { color:#ff9c95; font-size:22px; }
+    .result-actions { padding:0 25px 25px; }
+    .approval { display:flex; gap:10px; align-items:flex-start; padding:15px; border:1px solid var(--line); border-radius:13px; background:#faf9f4; font-size:13px; line-height:1.55; }
+    .approval input { margin-top:3px; accent-color:var(--ink); }
+    .export { margin-top:10px; width:100%; border:0; padding:14px; border-radius:12px; background:var(--yellow); font-weight:800; }
+    .export:disabled { background:#e5e2d8; color:#9b9a95; cursor:not-allowed; }
+    .downloads { display:grid; grid-template-columns:repeat(3,minmax(0,1fr)); gap:8px; margin-top:12px; }
+    .downloads a { text-decoration:none; color:var(--ink); border:1px solid var(--line); padding:10px; border-radius:10px; background:white; font-size:12px; font-weight:700; }
+    .logbox { margin-top:12px; }
+    .logbox pre { max-height:170px; overflow:auto; white-space:pre-wrap; color:#c6c7c0; background:#1d1e1b; padding:14px; border-radius:10px; font:12px/1.6 ui-monospace,monospace; }
+    .toast { position:fixed; left:50%; bottom:28px; transform:translate(-50%,20px); opacity:0; pointer-events:none; background:#171816; color:white; padding:12px 18px; border-radius:12px; box-shadow:var(--shadow); transition:.2s ease; z-index:20; }
+    .toast.show { opacity:1; transform:translate(-50%,0); }
+    footer { color:var(--muted); font-size:13px; text-align:center; padding:0 0 38px; }
+    @media (max-width:1480px) { .workspace { grid-template-columns:minmax(480px,.76fr) minmax(700px,1.24fr); } .downloads { grid-template-columns:1fr 1fr; } }
+    @media (max-width:1240px) { .workspace { grid-template-columns:1fr; } .result-panel { position:static; order:-1; } .steps .step span { display:none; } .steps .step { justify-content:center; } .demo-modal { grid-template-columns:280px 1fr; } }
+    @media (max-width:680px) { .template-grid { grid-template-columns:1fr; } .template-poster { aspect-ratio:16/9; } .scene-role-grid { grid-template-columns:repeat(2,1fr); } .scene-role:last-child { grid-column:1/-1; } .demo-modal { grid-template-columns:1fr; } .demo-modal-visual { padding:16px; } .demo-modal-visual .template-poster { width:100%; } }
+    @media (max-width:760px) { .ready-view.show { grid-template-columns:1fr; } .inline-preview-column { padding:20px 20px 8px; } .inline-preview-screen { width:min(100%,290px); } .ready-copy { padding-top:20px; } }
+    @media (max-width:580px) { .shell { width:min(100% - 24px,1760px); } header { padding-top:16px; } .privacy { display:none; } .hero { padding-top:24px; } .fields,.modes { grid-template-columns:1fr; } .section { padding:24px 16px; } .submit-area { padding:20px 16px 24px; } .agent-flow { margin:0 16px 16px; } .agent-grid { grid-template-columns:1fr; } .preview-action-row { grid-template-columns:1fr; } .ready-copy { padding:20px; } }
+  </style>
+</head>
+<body>
+  <div class="shell">
+    <header>
+      <div class="brand"><div class="brand-mark"></div><div><strong>成片工坊</strong><small>口播视频自动包装</small></div></div>
+      <div class="privacy"><i></i>默认本机处理；智能取材由你主动开启</div>
+    </header>
+
+    <section class="hero">
+      <div class="eyebrow">从录制到成片</div>
+      <h1>把视频放进来，<br>剩下的交给我们。</h1>
+      <p>自动整理节奏、配背景乐、生成动态字幕与章节，再用半屏素材丰富口播，同时做好可发布封面。</p>
+    </section>
+
+    <nav class="steps" aria-label="制作步骤">
+      <div class="step active" data-step="1"><b>1</b><span>上传素材</span></div>
+      <div class="step" data-step="2"><b>2</b><span>选择模板</span></div>
+      <div class="step" data-step="3"><b>3</b><span>剪辑方式</span></div>
+      <div class="step" data-step="4"><b>4</b><span>补充信息</span></div>
+      <div class="step" data-step="5"><b>5</b><span>预览导出</span></div>
+    </nav>
+
+    <main class="workspace">
+      <form id="jobForm" class="panel" enctype="multipart/form-data">
+        <section class="section">
+          <div class="section-head"><div class="number">1</div><div><h2>选择主视频</h2><p>手机、相机或剪辑软件导出的视频都可以</p></div></div>
+          <div class="dropzone" id="videoDrop">
+            <input id="videoInput" name="video" type="file" accept="video/mp4,video/quicktime,video/webm,.m4v,.mkv" required />
+            <div class="drop-prompt" id="videoPrompt"><div class="upload-icon">＋</div><strong>拖入视频，或点击选择</strong><span>支持 MP4、MOV、M4V、WebM、MKV</span></div>
+            <div class="file-picked" id="videoPicked"><video class="file-thumb" id="videoThumb" muted></video><div class="file-meta"><strong id="videoName"></strong><span id="videoSize"></span></div><button type="button" class="change">更换</button></div>
+          </div>
+        </section>
+
+        <section class="section">
+          <div class="section-head"><div class="number">2</div><div><h2>先选整套视频模板</h2><p>它会统一决定开场重点、观点提示、素材画面、章节和字幕的视觉语言</p></div></div>
+          <label class="template-auto"><input type="radio" name="motion_template" value="auto" checked><span><b>让系统读完内容后智能推荐</b><small>不确定选哪套时使用。系统会根据对比观点、数字密度和场景数量选择最匹配的模板。</small></span></label>
+          <div class="template-grid" id="templateGrid" aria-label="视频模板"></div>
+          <section class="scene-pack" aria-labelledby="scenePackTitle">
+            <div class="scene-pack-head">
+              <div><span class="scene-pack-eyebrow">配套画面 · 可选</span><h3 id="scenePackTitle">要不要让画面跟着内容变化？</h3><p>系统会先读懂正在讲什么，再决定保留人物、切换素材或展示知识卡。</p></div>
+              <span class="scene-pack-status" id="scenePackStatus">当前关闭</span>
+            </div>
+            <label class="scene-pack-switch"><input id="smartMedia" name="smart_media" type="checkbox"><span><b>开启配套画面</b><small>只有开启后，系统才会使用你上传的素材，或从网上抓取、生成匹配画面；关闭时只包装原口播。</small></span></label>
+            <div class="scene-pack-source" id="scenePackSource" aria-live="polite"><span id="scenePackHelp">当前不会抓取或生成画面，主讲人始终是视觉主体。</span><button id="scenePackSetupBtn" type="button">查看画面来源</button></div>
+            <div class="scene-roles">
+              <div class="scene-roles-head"><b>视觉编排预览</b><span>系统会按内容选择合适角色</span></div>
+              <div class="scene-role-grid">
+                <div class="scene-role"><div class="scene-role-visual person"></div><b>人物主场</b><small>情绪、观点与背书</small></div>
+                <div class="scene-role"><div class="scene-role-visual media"></div><b>素材主场</b><small>具体场景与动作</small></div>
+                <div class="scene-role"><div class="scene-role-visual concept"></div><b>概念解释</b><small>抽象观点说清楚</small></div>
+                <div class="scene-role"><div class="scene-role-visual summary"></div><b>知识总结</b><small>结论和重点回收</small></div>
+                <div class="scene-role"><div class="scene-role-visual chapter"></div><b>章节转折</b><small>只在段落切换全屏</small></div>
+              </div>
+            </div>
+          </section>
+        </section>
+
+        <section class="section">
+          <div class="section-head"><div class="number">3</div><div><h2>视频需要怎么处理？</h2><p>不确定就选自动判断</p></div></div>
+          <div class="modes">
+            <label class="mode"><input type="radio" name="mode" value="auto" checked><span class="badge">推荐</span><strong>自动判断</strong><span>识别视频是否已经剪过，有长停顿才会处理。</span></label>
+            <label class="mode"><input type="radio" name="mode" value="keep"><strong>保持原片</strong><span>不改变视频长度，只加字幕、推近和图文包装。</span></label>
+            <label class="mode"><input type="radio" name="mode" value="recut"><strong>剪掉长停顿</strong><span>清理明显空白，观点顺序保持不变。</span></label>
+          </div>
+        </section>
+
+        <section class="section">
+          <div class="section-head"><div class="number">4</div><div><h2>补充发布信息</h2><p>都可以留空，系统会从内容和文件名自动提取</p></div></div>
+          <div class="fields">
+            <label class="field full"><span>封面主标题（选填）</span><input name="title" type="text" maxlength="42" placeholder="例如：麦当劳的伪学徒"></label>
+            <label class="field full"><span>封面副标题（选填）</span><input name="subtitle" type="text" maxlength="70" placeholder="例如：过度追求规模化标准化，忘了餐饮做的是人的生意"></label>
+            <label class="field"><span>栏目名</span><input name="series" type="text" maxlength="16" value="观点拆解"></label>
+            <label class="field"><span>出镜人（选填）</span><input name="speaker" type="text" maxlength="20" placeholder="例如：余金钢"></label>
+            <label class="field full"><span>主讲人 Title（选填）</span><input name="speaker_title" type="text" maxlength="28" placeholder="例如：餐饮经营顾问 / 品牌创始人"></label>
+          </div>
+          <div class="music-row">
+            <strong>背景音乐</strong>
+            <div class="music-options">
+              <label class="music-option"><input type="radio" name="bgm_mode" value="generated" checked>自动配一条</label>
+              <label class="music-option"><input type="radio" name="bgm_mode" value="upload">使用自己的</label>
+              <label class="music-option"><input type="radio" name="bgm_mode" value="none">暂不添加</label>
+            </div>
+            <input class="bgm-upload" id="bgmInput" name="bgm" type="file" accept="audio/mpeg,audio/wav,audio/mp4,audio/aac,audio/flac,audio/ogg,.m4a">
+          </div>
+          <details id="mediaDirectorDetails">
+            <summary>配套素材与智能导演（“视觉杂志”建议开启）</summary>
+            <div class="advanced">
+              <label class="field full"><span>补充图片或视频（最多 12 个）</span><div class="image-drop"><input id="mediaInput" name="media" type="file" accept="image/png,image/jpeg,image/webp,video/mp4,video/quicktime,video/webm,.m4v,.mkv" multiple>点击或拖入。系统会优先放在画面上半区，不遮挡人脸和字幕。</div><div class="image-list" id="mediaList"></div></label>
+              <div class="fields" style="margin-top:14px">
+                <label class="field"><span>重点词</span><input name="keywords" type="text" placeholder="规模化、标准化、风味"></label>
+                <label class="field"><span>强调色</span><div class="color-row"><input name="accent" type="color" value="#ffd83d"><span style="color:var(--muted);font-size:13px">用于关键词和封面</span></div></label>
+              </div>
+              <label class="toggle-row"><input id="directorEnabled" name="director_enabled" type="checkbox" checked><span><b>用大模型担任智能导演</b><small>阅读完整逐字稿后，统一决定开场重点、观点提示、字幕强调、章节、场景素材和讲师名片。未配置时会明确显示“规则兜底”。</small></span></label>
+              <div class="fields provider-fields show" id="providerFields">
+                <div class="credential-vault field full">
+                  <div class="credential-vault-copy"><span class="credential-vault-icon">◆</span><div><b>本机凭据保险箱</b><small>Key 保存在操作台后端的专用凭据文件，仅当前 Mac 账户可读写；只在生成时交给本机进程。页面只能看到配置状态，不能读取明文；不会写入浏览器、视频项目、任务配置或日志。</small></div></div>
+                  <span class="credential-state" id="credentialState">尚未配置</span>
+                </div>
+                <label class="field full"><span>火山方舟 API Key（智能导演 / 生图 / 视频）<em class="credential-badge" id="arkKeyBadge">未保存</em></span><input id="arkKeyInput" name="ark_key" type="password" autocomplete="new-password" data-1p-ignore="true" data-lpignore="true" spellcheck="false" placeholder="粘贴后点击下方“安全保存”"></label>
+                <label class="field full"><span>智能导演模型 ID</span><input name="director_model" type="text" value="doubao-seed-2-0-lite-260215"></label>
+                <label class="field"><span>场景生成方式</span><select name="scene_generation"><option value="auto">智能混合：动作生视频，物品生图片</option><option value="image">全部生成图片</option><option value="video">尽量都生成视频</option><option value="none">只检索真实视频，不生成</option></select></label>
+                <label class="field"><span>火山生图模型</span><input name="ark_image_model" type="text" value="doubao-seedream-5-0-lite-260128"></label>
+                <label class="field full"><span>火山视频模型</span><input name="ark_video_model" type="text" value="doubao-seedance-1-5-pro-251215"></label>
+                <label class="field full"><span>Pexels API Key（视频检索，可选）<em class="credential-badge" id="pexelsKeyBadge">未保存</em></span><input id="pexelsKeyInput" name="pexels_key" type="password" autocomplete="new-password" data-1p-ignore="true" data-lpignore="true" spellcheck="false" placeholder="粘贴后点击下方“安全保存”"></label>
+                <label class="field full"><span>OpenAI API Key（AI 生图，可选，可能产生费用）<em class="credential-badge" id="openaiKeyBadge">未保存</em></span><input id="openaiKeyInput" name="openai_key" type="password" autocomplete="new-password" data-1p-ignore="true" data-lpignore="true" spellcheck="false" placeholder="粘贴后点击下方“安全保存”"></label>
+                <div class="credential-actions field full"><button id="saveKeysBtn" type="button" disabled>安全保存</button><button id="clearKeysBtn" class="secondary" type="button" disabled>清空已保存的 Key</button><small id="credentialHint">保存后输入框会立即清空；后续制作无需重复填写。</small></div>
+                <label class="toggle-row field full" style="margin-top:0"><input name="allow_ai_images" type="checkbox"><span><b>视频没找到时允许 AI 生图</b><small>保持整条视频的统一编辑风格。</small></span></label>
+              </div>
+            </div>
+          </details>
+        </section>
+
+        <div class="submit-area"><button id="startBtn" class="primary" type="submit">开始生成成片方案</button><p>第一次使用需要准备识别组件，之后会更快</p></div>
+      </form>
+
+      <aside class="panel result-panel">
+        <div class="result-top"><h2>制作结果</h2><span class="status-pill" id="statusPill">等待素材</span></div>
+        <section class="agent-flow" id="agentFlow" aria-live="polite" aria-label="制作团队协作进度">
+          <div class="agent-flow-head">
+            <div><span class="agent-flow-kicker">AGENT WORKFLOW</span><h3>8 位制作搭档协作完成</h3><p id="agentFlowSummary">上传视频后，他们会按顺序分析、制作、装配并检查。</p></div>
+            <span class="agent-flow-state" id="agentFlowState">尚未开始</span>
+          </div>
+          <div class="agent-grid" id="agentGrid"></div>
+          <div class="agent-focus" id="agentFocus"><b>当前说明</b><span id="agentFocusText">先选择主视频，制作团队会自动接手后续工作。</span></div>
+        </section>
+        <div class="stage">
+          <div class="empty" id="emptyView"><div class="phone"></div><strong>这里会出现你的成片方案</strong><span>上传后可以看到处理进度、封面、视频预览和下载文件。</span></div>
+          <div class="processing" id="processingView"><div class="spinner"></div><h3 id="processTitle">正在准备</h3><p id="processDetail">素材上传完成后会自动开始</p><div class="bar"><i id="progressBar"></i></div><div class="percent"><span>自动保存进度</span><b id="progressText">0%</b></div></div>
+          <div class="ready-view" id="readyView">
+            <div class="inline-preview-column">
+              <div class="inline-preview-card">
+                <div class="inline-preview-head"><div><b>成片预览</b><small>直接在这里检查画面、字幕和声音</small></div><span class="inline-live" id="inlinePreviewState">准备中</span></div>
+                <div class="inline-preview-screen">
+                  <hyperframes-player id="inlinePreviewPlayer" controls width="1080" height="1920" shader-capture-scale="1" shader-loading="player" aria-label="成片实时预览"></hyperframes-player>
+                  <video id="inlinePreviewVideo" controls playsinline preload="metadata" hidden></video>
+                  <div class="inline-preview-placeholder" id="inlinePreviewPlaceholder"><div><b>正在准备预览</b><span>播放器就绪后会自动显示在这里</span></div></div>
+                </div>
+                <div class="preview-action-row"><button type="button" class="secondary accent" id="previewBtn">重新加载预览</button><button type="button" class="secondary" id="editorBtn">高级编辑</button></div>
+                <p class="editor-note">普通检查无需进入编辑器；需要调整时间线、字幕或动效时再打开。</p>
+              </div>
+            </div>
+            <div class="ready-copy">
+              <small>READY TO REVIEW</small><h3 id="resultTitle">成片方案已生成</h3>
+              <div class="copy-summary" id="copySummary"><em id="copyAngle">全文提炼</em><b id="copyHeadline">—</b><p id="copySubtitle">—</p><small id="copyHook">—</small></div>
+              <div class="metrics"><div class="metric"><b id="durationMetric">—</b><span>成片时长</span></div><div class="metric"><b id="directorMetric">—</b><span>智能导演</span></div><div class="metric"><b id="styleMetric">—</b><span>已用模板</span></div><div class="metric"><b id="chapterMetric">—</b><span>全屏章节</span></div><div class="metric"><b id="supportMetric">—</b><span>辅助画面</span></div><div class="metric"><b id="emphasisMetric">—</b><span>重点字幕</span></div><div class="metric"><b id="bgmMetric">—</b><span>节目混音</span></div></div>
+              <div class="bgm-preview" id="bgmPreviewBox" hidden><b>试听人声与配乐的实际混音</b><audio id="bgmPreview" controls preload="metadata"></audio><small>这就是预览和最终导出使用的同一条节目音轨，不再依赖播放器临时叠加。</small></div>
+              <div class="cover-current"><img id="coverImage" alt="自动生成的封面"><div><b>当前发布封面</b><span>下方可切换模板并立即查看</span></div><a class="secondary" id="coverLink" target="_blank">查看大图</a></div>
+              <div class="cover-picker"><b>选择一张发布封面</b><div class="cover-options" id="coverOptions"></div></div>
+            </div>
+          </div>
+          <div class="error-view" id="errorView"><b>处理遇到问题</b><p id="errorText"></p><button class="secondary" type="button" onclick="document.querySelector('.logbox details').open=true">查看详细原因</button></div>
+        </div>
+        <div class="result-actions" id="resultActions" hidden>
+          <label class="approval"><input id="approved" type="checkbox"><span>我已经在右侧预览中检查了章节、半屏素材、字幕、背景乐和封面，可以导出最终视频。</span></label>
+          <button id="renderBtn" class="export" type="button" disabled>确认并导出最终 MP4</button>
+          <div class="downloads" id="downloads"></div>
+          <div class="logbox"><details><summary>查看处理详情</summary><pre id="logs"></pre></details></div>
+        </div>
+      </aside>
+    </main>
+    <footer>成片工坊 · 所有素材与产物都保存在这台电脑上</footer>
+  </div>
+  <dialog id="templateDialog"><div class="demo-modal"><div class="demo-modal-visual" id="dialogVisual"></div><div class="demo-modal-copy"><button class="demo-close" id="demoClose" type="button" aria-label="关闭">×</button><div class="eyebrow" id="dialogEyebrow">模板演示</div><h3 id="dialogTitle">—</h3><p id="dialogDescription">—</p><ul class="demo-feature-list" id="dialogFeatures"></ul><div class="demo-timeline"><b>这套模板如何组织一条视频</b><div id="dialogTimeline"></div></div><button class="primary" id="useTemplateBtn" type="button" style="margin-top:24px">使用这套模板</button></div></div></dialog>
+  <div class="toast" id="toast"></div>
+
+  <script src="/vendor/hyperframes-player.global.js"></script>
+  <script>
+    const form = document.getElementById('jobForm');
+    const videoInput = document.getElementById('videoInput');
+    const videoDrop = document.getElementById('videoDrop');
+    const mediaInput = document.getElementById('mediaInput');
+    const bgmInput = document.getElementById('bgmInput');
+    const smartMedia = document.getElementById('smartMedia');
+    const directorEnabled = document.getElementById('directorEnabled');
+    const approved = document.getElementById('approved');
+    const renderBtn = document.getElementById('renderBtn');
+    let lastPhase = '';
+    let templateLibrary = [];
+    let dialogTemplate = '';
+    let providerStatus = {ark:false,pexels:false,openai:false};
+    const inlinePreviewPlayer = document.getElementById('inlinePreviewPlayer');
+    const inlinePreviewVideo = document.getElementById('inlinePreviewVideo');
+    const inlinePreviewPlaceholder = document.getElementById('inlinePreviewPlaceholder');
+    const inlinePreviewState = document.getElementById('inlinePreviewState');
+    let inlinePreviewLoadPromise = null;
+    let inlinePreviewExpectedDuration = 0;
+    let inlinePreviewClock = 0;
+    let inlineEditorUrl = 'http://127.0.0.1:3002/#project/video-production-workflow';
+    const credentialInputs = {
+      ark:document.getElementById('arkKeyInput'),
+      pexels:document.getElementById('pexelsKeyInput'),
+      openai:document.getElementById('openaiKeyInput')
+    };
+    const agentStages = [
+      {id:'content', label:'内容分析', task:'读懂观点、场景与情绪'},
+      {id:'director', label:'总导演', task:'统一镜头与节奏策略'},
+      {id:'media', label:'配套素材', task:'检索或生成匹配画面'},
+      {id:'motion', label:'Motion', task:'设计字幕、动画与转场'},
+      {id:'audio', label:'声音设计', task:'选择配乐并完成混音'},
+      {id:'cover', label:'封面设计', task:'提炼标题与视觉方案'},
+      {id:'assembly', label:'成片装配', task:'按时间线组合所有成果'},
+      {id:'qa', label:'视听质检', task:'检查冲突、对齐与可读性'}
+    ];
+    const agentAliases = {
+      content:'content', content_analysis:'content', analysis:'content', transcript:'content',
+      director:'director', chief_director:'director', planner:'director',
+      media:'media', material:'media', materials:'media', asset:'media', assets:'media', visual:'media',
+      motion:'motion', animation:'motion', graphics:'motion',
+      audio:'audio', sound:'audio', music:'audio', bgm:'audio',
+      cover:'cover', thumbnail:'cover', poster:'cover',
+      assembly:'assembly', compose:'assembly', compositor:'assembly', timeline:'assembly', render:'assembly',
+      qa:'qa', qc:'qa', quality:'qa', review:'qa', inspector:'qa'
+    };
+
+    const fmtSize = bytes => bytes > 1024**3 ? `${(bytes/1024**3).toFixed(1)} GB` : bytes > 1024**2 ? `${(bytes/1024**2).toFixed(1)} MB` : `${Math.ceil(bytes/1024)} KB`;
+    const fmtTime = seconds => { const s=Math.round(seconds||0), m=Math.floor(s/60); return m ? `${m}分${String(s%60).padStart(2,'0')}秒` : `${s}秒`; };
+    const toast = message => { const el=document.getElementById('toast'); el.textContent=message; el.classList.add('show'); setTimeout(()=>el.classList.remove('show'),2600); };
+    const plainLanguage = value => String(value||'').replaceAll('Hook','开场重点').replaceAll('Callout','观点提示').replaceAll('Motion','动效');
+
+    function setInlineReady(label='可播放') {
+      inlinePreviewPlaceholder.hidden=true;
+      inlinePreviewState.textContent=label;
+      inlinePreviewState.style.background='#E8FFEA';
+      inlinePreviewState.style.color='#00B42A';
+    }
+    function primeInlinePlayer() {
+      if(!inlinePreviewExpectedDuration||!inlinePreviewPlayer.iframeElement) return;
+      inlinePreviewPlayer._duration=inlinePreviewExpectedDuration;
+      inlinePreviewPlayer._ready=true;
+      inlinePreviewPlayer.controlsApi?.updateTime(inlinePreviewPlayer.currentTime||0,inlinePreviewExpectedDuration);
+      setInlineReady();
+    }
+    function runInlineClock() {
+      cancelAnimationFrame(inlinePreviewClock);
+      let previous=performance.now();
+      const tick=now=>{
+        if(inlinePreviewPlayer.paused) return;
+        const next=Math.min(inlinePreviewExpectedDuration,(inlinePreviewPlayer.currentTime||0)+(now-previous)/1000);
+        previous=now;
+        inlinePreviewPlayer._currentTime=next;
+        inlinePreviewPlayer.controlsApi?.updateTime(next,inlinePreviewExpectedDuration);
+        if(next>=inlinePreviewExpectedDuration) { inlinePreviewPlayer.pause();return; }
+        inlinePreviewClock=requestAnimationFrame(tick);
+      };
+      inlinePreviewClock=requestAnimationFrame(tick);
+    }
+    async function loadInlinePreview(force=false) {
+      if(inlinePreviewVideo.src&&!inlinePreviewVideo.hidden) { inlinePreviewVideo.currentTime=0;void inlinePreviewVideo.play().catch(()=>{});return; }
+      if(inlinePreviewLoadPromise&&!force) return inlinePreviewLoadPromise;
+      inlinePreviewState.textContent='准备中';
+      inlinePreviewPlaceholder.hidden=false;
+      inlinePreviewPlaceholder.innerHTML='<div><b>正在准备预览</b><span>首次加载可能需要几秒钟</span></div>';
+      const run=(async()=>{
+        const res=await fetch('/api/preview',{method:'POST'}),data=await res.json();
+        if(!res.ok) throw new Error(data.error||'预览没有启动成功');
+        inlineEditorUrl=data.url||inlineEditorUrl;
+        const embed=data.embed_url;
+        if(!embed) throw new Error('没有取得内嵌预览地址');
+        const src=force?`${embed}${embed.includes('?')?'&':'?'}v=${Date.now()}`:embed;
+        if(force||inlinePreviewPlayer.dataset.previewSrc!==embed) {
+          inlinePreviewPlayer.dataset.previewSrc=embed;
+          inlinePreviewPlayer.setAttribute('src',src);
+        }
+        return data;
+      })();
+      inlinePreviewLoadPromise=run;
+      try { return await run; }
+      catch(err) {
+        inlinePreviewState.textContent='加载失败';
+        inlinePreviewState.style.background='#FFECE8';
+        inlinePreviewState.style.color='#F53F3F';
+        inlinePreviewPlaceholder.innerHTML=`<div><b>预览暂时没有加载</b><span>${String(err.message||err)}</span></div>`;
+        throw err;
+      } finally { inlinePreviewLoadPromise=null; }
+    }
+    function configureInlinePreview(artifacts,summary) {
+      inlinePreviewExpectedDuration=Math.max(0,Number(summary?.edited_duration)||0);
+      const finalVideo=(artifacts||[]).find(item=>item.kind==='video');
+      if(finalVideo) {
+        inlinePreviewPlayer.hidden=true;
+        inlinePreviewVideo.hidden=false;
+        if(!inlinePreviewVideo.src.endsWith(finalVideo.url)) inlinePreviewVideo.src=finalVideo.url;
+        inlinePreviewPlaceholder.hidden=true;
+        setInlineReady('最终成片');
+        document.getElementById('previewBtn').textContent='从头播放';
+      } else {
+        inlinePreviewVideo.pause();
+        inlinePreviewVideo.hidden=true;
+        inlinePreviewPlayer.hidden=false;
+        document.getElementById('previewBtn').textContent='重新加载预览';
+        primeInlinePlayer();
+        if(!inlinePreviewPlayer.dataset.previewSrc) loadInlinePreview().catch(()=>{});
+      }
+    }
+
+    function normalizeAgentId(value) {
+      const key=String(value||'').trim().toLowerCase().replace(/[\s-]+/g,'_');
+      return agentAliases[key]||key;
+    }
+    function normalizeAgentStatus(value,progress=0) {
+      const state=String(value||'').trim().toLowerCase();
+      if(['done','complete','completed','success','succeeded','ready','通过','完成'].includes(state)) return 'done';
+      if(['active','running','working','processing','generating','in_progress','执行中','处理中'].includes(state)) return 'active';
+      if(['error','failed','failure','blocked','失败','错误','阻塞'].includes(state)) return 'error';
+      if(['skipped','disabled','not_needed','跳过','未启用'].includes(state)) return 'skipped';
+      if(Number(progress)>=100) return 'done';
+      if(Number(progress)>0) return 'active';
+      return 'pending';
+    }
+    function workflowPayload(data={}) {
+      const raw=data.agent_workflow??data.workflow??data.summary?.agent_workflow??data.summary?.workflow??data.agents;
+      if(!raw) return {meta:{},items:[]};
+      if(Array.isArray(raw)) return {meta:{},items:raw};
+      const looksLikeAgentMap=raw&&typeof raw==='object'&&Object.keys(raw).some(key=>agentStages.some(agent=>agent.id===normalizeAgentId(key)));
+      const source=raw.agents??raw.steps??raw.stages??(looksLikeAgentMap?raw:[]);
+      if(Array.isArray(source)) return {meta:raw,items:source};
+      if(source&&typeof source==='object') return {meta:raw,items:Object.entries(source).map(([id,value])=>({id,...(typeof value==='object'?value:{status:value})}))};
+      return {meta:raw,items:[]};
+    }
+    function fallbackAgentStates(data={}) {
+      const phase=data.phase||'idle', progress=Math.max(0,Math.min(100,Number(data.progress)||0));
+      const states=Object.fromEntries(agentStages.map(item=>[item.id,{status:'pending',detail:item.task}]));
+      const finish=ids=>ids.forEach(id=>states[id].status='done');
+      const activate=ids=>ids.forEach(id=>states[id].status='active');
+      if(['ready','complete'].includes(phase)||(phase==='idle'&&data.has_previous_result)) { finish(agentStages.map(item=>item.id)); return states; }
+      if(phase==='idle'||phase==='uploading') return states;
+      if(progress<22) activate(['content']);
+      else if(progress<35) { finish(['content']);activate(['director']); }
+      else if(progress<72) { finish(['content','director']);activate(['media','motion','audio','cover']); }
+      else if(progress<90) { finish(['content','director','media','motion','audio','cover']);activate(['assembly']); }
+      else { finish(['content','director','media','motion','audio','cover','assembly']);activate(['qa']); }
+      if(phase==='error') {
+        const current=agentStages.find(item=>states[item.id].status==='active')||agentStages[0];
+        states[current.id].status='error';states[current.id].detail=data.detail||data.message||'需要处理后继续';
+      }
+      return states;
+    }
+    function renderAgentWorkflow(data={}) {
+      const grid=document.getElementById('agentGrid');
+      const payload=workflowPayload(data), states=fallbackAgentStates(data);
+      const explicit=payload.items.length>0;
+      const activeId=normalizeAgentId(payload.meta.active_agent??payload.meta.activeAgent??data.active_agent);
+      payload.items.forEach(item=>{
+        const id=normalizeAgentId(item.id??item.key??item.agent??item.name);
+        if(!states[id]) return;
+        const progress=item.progress??item.percent??0;
+        states[id]={status:normalizeAgentStatus(item.status??item.state,progress),detail:item.detail??item.message??item.summary??item.output??states[id].detail,progress};
+      });
+      if(activeId&&states[activeId]&&states[activeId].status==='pending') states[activeId].status='active';
+      grid.innerHTML='';
+      agentStages.forEach((agent,index)=>{
+        const state=states[agent.id],card=document.createElement('div');
+        card.className=`agent-card ${state.status}`;card.dataset.agent=agent.id;
+        const number=document.createElement('span');number.className='agent-index';number.textContent=String(index+1).padStart(2,'0');
+        const copy=document.createElement('div');copy.className='agent-card-copy';
+        const title=document.createElement('b');title.textContent=agent.label;
+        const detail=document.createElement('small');detail.textContent=state.detail||agent.task;detail.title=detail.textContent;
+        const dot=document.createElement('i');dot.className='agent-status';dot.setAttribute('aria-label',({pending:'等待',active:'进行中',done:'完成',error:'失败',skipped:'跳过'})[state.status]||'等待');
+        copy.append(title,detail);card.append(number,copy,dot);grid.appendChild(card);
+      });
+      const all=Object.values(states), done=all.filter(item=>item.status==='done').length, active=agentStages.filter(item=>states[item.id].status==='active'), errors=agentStages.filter(item=>states[item.id].status==='error');
+      const stateEl=document.getElementById('agentFlowState'),summary=document.getElementById('agentFlowSummary'),focus=document.getElementById('agentFocusText');
+      stateEl.className='agent-flow-state';
+      if(errors.length) { stateEl.textContent='需要处理';stateEl.classList.add('error');summary.textContent=`${errors.map(item=>item.label).join('、')}遇到问题，已完成的工作会保留。`;focus.textContent=states[errors[0].id].detail||'请查看详细原因后重新尝试。'; }
+      else if(done===agentStages.length) { stateEl.textContent='全部完成';stateEl.classList.add('ready');summary.textContent=payload.meta.message||'分析、制作、装配与质检已经全部完成。';focus.textContent=payload.meta.detail||'可以打开视频预览，重点检查画面、字幕与声音是否符合预期。'; }
+      else if(active.length) { stateEl.textContent=`${done}/8 完成`;stateEl.classList.add('working');summary.textContent=active.length>1?`${active.map(item=>item.label).join('、')}正在并行制作，完成后统一交给装配与质检。`:`${active[0].label}正在处理，后续搭档会自动接力。`;focus.textContent=states[active[0].id].detail||active[0].task; }
+      else { stateEl.textContent='尚未开始';summary.textContent='上传视频后，他们会按顺序分析、制作、装配并检查。';focus.textContent=data.phase==='uploading'?'视频上传完成后，内容分析会第一个开始。':'先选择主视频，制作团队会自动接手后续工作。'; }
+      document.getElementById('agentFlow').dataset.source=explicit?'agents':'progress';
+    }
+
+    function templatePoster(template,large=false) {
+      const common='<div class="preview-chrome"><span>成片样张</span><b>09:16</b></div>';
+      if(template.id==='conflict') return `<div class="template-poster" data-template="conflict">${common}<div class="conflict-panels"><div><small>只追求</small><b>规模</b></div><div><small>真正应该</small><b>价值</b></div></div><div class="demo-caption">观点对立，结论<mark>清晰推进</mark></div></div>`;
+      if(template.id==='story') return `<div class="template-poster" data-template="story">${common}<div class="story-collage"><span></span><span></span><span></span></div><span class="story-label">SCENE / 门店现场</span></div>`;
+      if(template.id==='editorial') return `<div class="template-poster" data-template="editorial">${common}<div class="editorial-title"><small>VISUAL / 04</small><b>多镜头<br>杂志感</b></div><div class="editorial-card"><span></span></div><i class="editorial-pip"></i><div class="demo-caption">画面切换，但视觉语言<mark>保持统一</mark></div></div>`;
+      return `<div class="template-poster" data-template="expert">${common}<div class="preview-copy"><small>KEY POINT / 01</small><b>标准化 ≠<br>人的理解</b><span>专业行业洞察</span></div><div class="preview-speaker"></div><div class="demo-caption">真正重要的是<mark>顾客需要</mark>什么</div></div>`;
+    }
+    function selectTemplate(id) {
+      const input=document.querySelector(`input[name="motion_template"][value="${id}"]`);if(!input)return;input.checked=true;document.querySelectorAll('.template-card').forEach(card=>card.classList.toggle('chosen',card.dataset.template===id));if(id==='editorial')document.getElementById('mediaDirectorDetails').open=true;selectStep(3);
+    }
+    function renderTemplateGrid(items) {
+      templateLibrary=items;const grid=document.getElementById('templateGrid');grid.innerHTML='';items.forEach(item=>{const card=document.createElement('label');card.className='template-card';card.dataset.template=item.id;card.innerHTML=`<input type="radio" name="motion_template" value="${item.id}"><span class="template-select-mark" aria-hidden="true">✓</span>${templatePoster(item)}<div class="template-card-copy"><div class="template-title-row"><strong>${item.label}</strong><span>整套模板</span></div><div class="template-specs"><span>${plainLanguage(item.eyebrow)}</span><span>${plainLanguage(item.pacing||item.best_for)}</span></div><p>${plainLanguage(item.description)}</p></div><button class="template-demo-btn" type="button"><span>查看模板演示</span><i>↗</i></button>`;card.querySelector('input').addEventListener('change',()=>{if(item.id==='editorial')document.getElementById('mediaDirectorDetails').open=true;selectStep(3);});card.querySelector('.template-demo-btn').addEventListener('click',event=>{event.preventDefault();event.stopPropagation();openTemplateDemo(item.id);});grid.appendChild(card);});
+    }
+    function openTemplateDemo(id) {
+      const item=templateLibrary.find(value=>value.id===id);if(!item)return;dialogTemplate=id;document.getElementById('dialogVisual').innerHTML=templatePoster(item,true);document.getElementById('dialogEyebrow').textContent=`${plainLanguage(item.eyebrow)} / 模板演示`;document.getElementById('dialogTitle').textContent=item.label;document.getElementById('dialogDescription').textContent=`${plainLanguage(item.description)} 适合：${plainLanguage(item.best_for)}。${plainLanguage(item.pacing||'')}`;document.getElementById('dialogFeatures').innerHTML=(item.features||[]).map(value=>`<li>${plainLanguage(value)}</li>`).join('');document.getElementById('dialogTimeline').innerHTML=(item.demo_script||[]).map((value,index)=>`<div class="demo-beat"><b>${index+1}</b><span>${plainLanguage(value)}</span></div>`).join('');document.getElementById('templateDialog').showModal();
+    }
+    async function loadTemplateLibrary() { try{const res=await fetch('/api/motion-templates'),data=await res.json();renderTemplateGrid(data.templates||[]);}catch{toast('模板说明暂时没有加载出来，请刷新页面');} }
+
+    function typedProviderValues() {
+      return Object.fromEntries(Object.entries(credentialInputs).map(([name,input])=>[name,String(input?.value||'').trim()]));
+    }
+    function renderProviderStatus() {
+      const labels={ark:'arkKeyBadge',pexels:'pexelsKeyBadge',openai:'openaiKeyBadge'};
+      Object.entries(labels).forEach(([name,id])=>{
+        const saved=Boolean(providerStatus[name]),badge=document.getElementById(id),input=credentialInputs[name];
+        badge.textContent=saved?'已安全保存':'未保存';badge.classList.toggle('ready',saved);
+        input.placeholder=saved?'已保存；输入新 Key 可以替换':'粘贴后点击下方“安全保存”';
+      });
+      const savedCount=Object.values(providerStatus).filter(Boolean).length,typed=Object.values(typedProviderValues()).some(Boolean);
+      const state=document.getElementById('credentialState');state.textContent=savedCount?`已保存 ${savedCount} 项`:'尚未配置';state.classList.toggle('ready',savedCount>0);
+      document.getElementById('saveKeysBtn').disabled=!typed;
+      document.getElementById('clearKeysBtn').disabled=savedCount===0;
+      document.getElementById('credentialHint').textContent=savedCount?'已保存的明文不会返回页面；需要更换时直接输入新 Key 并再次保存。':'保存后输入框会立即清空；后续制作无需重复填写。';
+    }
+    async function saveProviderCredentials() {
+      const payload=typedProviderValues();
+      if(!Object.values(payload).some(Boolean)) { toast('请先填写需要保存的 Key');return; }
+      const button=document.getElementById('saveKeysBtn');button.disabled=true;button.textContent='正在安全保存…';
+      try {
+        const res=await fetch('/api/provider-keys',{method:'POST',headers:{'Content-Type':'application/json'},cache:'no-store',body:JSON.stringify(payload)}),data=await res.json();
+        if(!res.ok) throw new Error(data.error||'Key 没有保存成功');
+        Object.values(credentialInputs).forEach(input=>input.value='');providerStatus=data.provider_status||providerStatus;renderProviderStatus();syncScenePackStatus();toast('Key 已安全保存在本机');
+      } catch(err) { toast(err.message||'Key 没有保存成功'); }
+      finally { button.textContent='安全保存';renderProviderStatus(); }
+    }
+    async function clearProviderCredentials() {
+      if(!Object.values(providerStatus).some(Boolean)) return;
+      if(!window.confirm('确认清空本机保存的全部 API Key？清空后无法恢复。')) return;
+      const button=document.getElementById('clearKeysBtn');button.disabled=true;button.textContent='正在清空…';
+      try {
+        const res=await fetch('/api/provider-keys',{method:'DELETE',headers:{'Content-Type':'application/json'},cache:'no-store',body:JSON.stringify({providers:['ark','pexels','openai']})}),data=await res.json();
+        if(!res.ok) throw new Error(data.error||'Key 没有清空成功');
+        Object.values(credentialInputs).forEach(input=>input.value='');providerStatus=data.provider_status||{ark:false,pexels:false,openai:false};renderProviderStatus();syncScenePackStatus();toast('本机保存的 Key 已清空');
+      } catch(err) { toast(err.message||'Key 没有清空成功'); }
+      finally { button.textContent='清空已保存的 Key';renderProviderStatus(); }
+    }
+
+    function selectStep(number) { document.querySelectorAll('.step').forEach((el,i)=>el.classList.toggle('active',i===number-1)); }
+    function showVideo(file) {
+      if (!file) return;
+      document.getElementById('videoPrompt').style.display='none';
+      document.getElementById('videoPicked').classList.add('show');
+      document.getElementById('videoName').textContent=file.name;
+      document.getElementById('videoSize').textContent=`${fmtSize(file.size)} · 已准备上传`;
+      document.getElementById('videoThumb').src=URL.createObjectURL(file);
+      selectStep(2);
+    }
+    videoInput.addEventListener('change',()=>showVideo(videoInput.files[0]));
+    ['dragenter','dragover'].forEach(name=>videoDrop.addEventListener(name,e=>{e.preventDefault();videoDrop.classList.add('drag')}));
+    ['dragleave','drop'].forEach(name=>videoDrop.addEventListener(name,e=>{e.preventDefault();videoDrop.classList.remove('drag')}));
+    videoDrop.addEventListener('drop',e=>{ if(e.dataTransfer.files[0]) { const dt=new DataTransfer();dt.items.add(e.dataTransfer.files[0]);videoInput.files=dt.files;showVideo(dt.files[0]); } });
+    document.querySelectorAll('input[name="mode"]').forEach(el=>el.addEventListener('change',()=>selectStep(4)));
+    document.querySelector('input[name="motion_template"][value="auto"]').addEventListener('change',()=>selectStep(3));
+    function syncScenePackStatus() {
+      const count=Math.min(mediaInput.files.length,12);
+      const typedKeys=Object.values(typedProviderValues());
+      const hasTypedSource=typedKeys.some(value=>value.length>=12);
+      const hasIncompleteSource=typedKeys.some(value=>value.length>0&&value.length<12);
+      const hasSavedSource=Object.values(providerStatus).some(Boolean);
+      const hasOnlineSource=hasTypedSource||hasSavedSource;
+      const status=document.getElementById('scenePackStatus'),source=document.getElementById('scenePackSource'),help=document.getElementById('scenePackHelp'),setup=document.getElementById('scenePackSetupBtn');
+      status.className='scene-pack-status';source.className='scene-pack-source';
+      if(!smartMedia.checked) {
+        status.textContent=count?`已上传 ${count} 个 · 当前关闭`:hasOnlineSource?'来源已设置 · 当前关闭':'当前关闭';
+        help.textContent=count?`已有 ${count} 个自己的素材，打开上方开关后系统才会使用。`:hasOnlineSource?'本机已有在线画面来源设置；打开上方开关后，生成时会先验证再使用。':'当前不会抓取或生成画面，主讲人始终是视觉主体。';
+        setup.textContent='查看画面来源';
+        return;
+      }
+      status.classList.add('on');source.classList.add('on');
+      if(count||hasOnlineSource) {
+        status.textContent=count?'自己的素材已就绪':'在线来源已设置';status.classList.add('ready');source.classList.add('ready');
+        help.textContent=count?`已添加 ${count} 个自己的素材，系统会优先使用，再按需补充。`:'已检测到本机或当前填写的在线来源；生成时会验证可用性，只为适合可视化的内容寻找画面。';
+        setup.textContent='查看画面来源';
+      } else if(hasIncompleteSource) {
+        status.textContent='设置待检查';
+        help.textContent='填写的在线来源信息看起来不完整，请检查后再开始；没有合适来源时不会硬套无关画面。';
+        setup.textContent='继续设置';
+      } else {
+        status.textContent='已开启 · 待设置';
+        help.textContent='请添加自己的图片或视频，或完成在线取材设置；没有合适来源时不会硬套无关画面。';
+        setup.textContent='添加或设置';
+      }
+    }
+    mediaInput.addEventListener('change',()=>{ const box=document.getElementById('mediaList');box.innerHTML='';[...mediaInput.files].slice(0,12).forEach(file=>{const wrap=document.createElement('div');wrap.className='media-chip';const isVideo=file.type.startsWith('video/');const el=document.createElement(isVideo?'video':'img');el.src=URL.createObjectURL(file);el.alt=file.name;if(isVideo){el.muted=true;el.playsInline=true;el.currentTime=.1;}wrap.appendChild(el);box.appendChild(wrap)});syncScenePackStatus(); });
+    document.querySelectorAll('input[name="bgm_mode"]').forEach(el=>el.addEventListener('change',()=>bgmInput.classList.toggle('show',el.checked&&el.value==='upload')));
+    const syncProviderFields=()=>document.getElementById('providerFields').classList.toggle('show',smartMedia.checked||directorEnabled.checked);
+    smartMedia.addEventListener('change',()=>{syncProviderFields();syncScenePackStatus();});directorEnabled.addEventListener('change',syncProviderFields);
+    Object.values(credentialInputs).forEach(input=>input?.addEventListener('input',()=>{renderProviderStatus();syncScenePackStatus();}));
+    document.getElementById('saveKeysBtn').addEventListener('click',saveProviderCredentials);
+    document.getElementById('clearKeysBtn').addEventListener('click',clearProviderCredentials);
+    document.getElementById('scenePackSetupBtn').addEventListener('click',()=>{const details=document.getElementById('mediaDirectorDetails');details.open=true;details.scrollIntoView({behavior:'smooth',block:'start'});});
+    syncProviderFields();renderProviderStatus();syncScenePackStatus();
+    approved.addEventListener('change',()=>renderBtn.disabled=!approved.checked);
+
+    form.addEventListener('submit',event=>{
+      event.preventDefault();
+      if(!videoInput.files[0]) { toast('请先选择一条视频'); return; }
+      if(Object.values(typedProviderValues()).some(Boolean)) { toast('请先点击“安全保存”，再开始生成');document.getElementById('mediaDirectorDetails').open=true;return; }
+      const data=new FormData(form), xhr=new XMLHttpRequest();
+      ['ark_key','pexels_key','openai_key'].forEach(name=>data.delete(name));
+      setWorking('正在上传视频','大文件上传可能需要一点时间',5,{phase:'uploading'});
+      document.getElementById('startBtn').disabled=true;
+      xhr.open('POST','/api/start');
+      xhr.upload.onprogress=e=>{ if(e.lengthComputable) setWorking('正在上传视频',`${fmtSize(e.loaded)} / ${fmtSize(e.total)}`,Math.max(5,Math.round(e.loaded/e.total*16)),{phase:'uploading'}); };
+      xhr.onload=()=>{ let body={};try{body=JSON.parse(xhr.responseText)}catch{} if(xhr.status>=200&&xhr.status<300){toast('素材已收到，开始制作');poll();}else{showError(body.error||'上传没有完成');document.getElementById('startBtn').disabled=false;} };
+      xhr.onerror=()=>{showError('连接中断，请重新尝试');document.getElementById('startBtn').disabled=false;};
+      xhr.send(data);
+    });
+
+    function setWorking(title,detail,progress,state={}) {
+      document.getElementById('emptyView').style.display='none'; document.getElementById('readyView').classList.remove('show'); document.getElementById('errorView').classList.remove('show');
+      document.getElementById('processingView').classList.add('show'); document.getElementById('processTitle').textContent=title; document.getElementById('processDetail').textContent=detail||'';
+      document.getElementById('progressBar').style.width=`${progress}%`; document.getElementById('progressText').textContent=`${progress}%`; setPill('制作中','working'); selectStep(progress<20?1:progress<60?2:3);
+      renderAgentWorkflow(Object.assign({phase:'processing',progress,message:title,detail},state));
+    }
+    function setPill(text,klass='') { const el=document.getElementById('statusPill');el.textContent=text;el.className=`status-pill ${klass}`; }
+    function showError(message,state={}) { document.getElementById('emptyView').style.display='none';document.getElementById('processingView').classList.remove('show');document.getElementById('readyView').classList.remove('show');document.getElementById('errorView').classList.add('show');document.getElementById('errorText').textContent=message;setPill('需要处理','error');renderAgentWorkflow(Object.assign({phase:'error',detail:message},state)); }
+    function showReady(data) {
+      const s=data.summary||{}; document.getElementById('emptyView').style.display='none';document.getElementById('processingView').classList.remove('show');document.getElementById('errorView').classList.remove('show');document.getElementById('readyView').classList.add('show');
+      renderAgentWorkflow(data);
+      const cover=(data.artifacts||[]).find(x=>x.name==='cover-9x16.png'); if(cover){document.getElementById('coverImage').src=cover.url;document.getElementById('coverLink').href=cover.url;}const music=(data.artifacts||[]).find(x=>x.kind==='audio-mix')||(data.artifacts||[]).find(x=>x.kind==='audio');const musicBox=document.getElementById('bgmPreviewBox');if(music){document.getElementById('bgmPreview').src=music.url;musicBox.hidden=false;}else musicBox.hidden=true;
+      const copy=s.cover_copy||{},director=s.director||{},chosen=(s.motion_templates||[]).find(item=>item.id===s.motion_template);document.getElementById('resultTitle').textContent=s.title||'成片方案已生成';document.getElementById('copyAngle').textContent=copy.angle||'全文提炼';document.getElementById('copyHeadline').textContent=copy.headline||s.title||'—';document.getElementById('copySubtitle').textContent=copy.subheadline||s.subtitle||'—';document.getElementById('copyHook').textContent=copy.hook?`观点钩子：${copy.hook}`:'系统会从完整内容中提炼观点钩子';document.getElementById('durationMetric').textContent=fmtTime(s.edited_duration);document.getElementById('directorMetric').textContent=director.status==='llm'?'大模型':'规则兜底';document.getElementById('directorMetric').title=director.reason||'';document.getElementById('styleMetric').textContent=chosen?.label||s.motion_template||'—';document.getElementById('chapterMetric').textContent=s.chapter_cards??'—';document.getElementById('supportMetric').textContent=s.callout_cards??'—';document.getElementById('emphasisMetric').textContent=s.caption_emphasis??'—';document.getElementById('bgmMetric').textContent=s.bgm_baked?'已混入':'无';renderCoverChoices(s.cover_templates||[],s.cover_template);configureInlinePreview(data.artifacts||[],s);
+      document.getElementById('resultActions').hidden=false;document.getElementById('startBtn').disabled=false;setPill(data.phase==='complete'?'已导出':'待确认','ready');selectStep(5);renderDownloads(data.artifacts||[]);
+    }
+    function renderCoverChoices(items,selected) { const box=document.getElementById('coverOptions'),signature=JSON.stringify([selected,items.map(item=>[item.id,item.preview])]);if(box.dataset.signature===signature)return;box.dataset.signature=signature;box.innerHTML='';items.forEach(item=>{const button=document.createElement('button');button.type='button';button.className=`cover-choice ${item.id===selected?'selected':''}`;button.title=item.description||item.label;button.innerHTML=`<img src="/output/${item.preview}?v=${Date.now()}" alt="${item.label}"><span>${item.label}</span>`;button.addEventListener('click',()=>chooseCover(item.id,button));box.appendChild(button);}); }
+    async function chooseCover(template,button) { const buttons=[...document.querySelectorAll('.cover-choice')];buttons.forEach(el=>el.disabled=true);try{const res=await fetch('/api/cover',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({template})}),data=await res.json();if(!res.ok)throw new Error(data.error);buttons.forEach(el=>el.classList.remove('selected'));button.classList.add('selected');document.getElementById('coverImage').src=data.cover_url;document.getElementById('coverLink').href=data.cover_url;toast('已切换发布封面');}catch(err){toast(err.message||'封面没有切换成功');}finally{buttons.forEach(el=>el.disabled=false);} }
+    function renderDownloads(items) { const box=document.getElementById('downloads');box.innerHTML='';items.forEach(item=>{const a=document.createElement('a');a.href=item.url+(item.url.includes('?')?'&':'?')+'download=1';a.textContent=`↓ ${item.label}`;a.download=item.name;box.appendChild(a);}); }
+    function applyStatus(data) {
+      providerStatus=data.provider_status||providerStatus;renderProviderStatus();syncScenePackStatus();
+      document.getElementById('logs').textContent=(data.logs||[]).join('\n');
+      if(['uploading','processing','rendering'].includes(data.phase)) setWorking(data.message,data.detail,data.progress||1,data);
+      else if(['ready','complete'].includes(data.phase)||(data.phase==='idle'&&data.has_previous_result)) showReady(data);
+      else if(data.phase==='error') showError(data.detail||data.message,data);
+      else renderAgentWorkflow(data);
+      if(data.phase!==lastPhase&&data.phase==='complete') toast('最终视频导出完成'); lastPhase=data.phase;
+    }
+    async function poll() { try{const res=await fetch('/api/status',{cache:'no-store'}),data=await res.json();applyStatus(data);}catch{} setTimeout(poll,1500); }
+
+    inlinePreviewPlayer.addEventListener('ready',()=>{ inlinePreviewExpectedDuration=inlinePreviewPlayer.duration||inlinePreviewExpectedDuration;setInlineReady(); });
+    inlinePreviewPlayer.addEventListener('play',runInlineClock);
+    inlinePreviewPlayer.addEventListener('pause',()=>cancelAnimationFrame(inlinePreviewClock));
+    inlinePreviewPlayer.addEventListener('error',event=>{
+      if(inlinePreviewExpectedDuration&&String(event.detail?.message||'').includes('timeline not found')) { primeInlinePlayer();return; }
+      inlinePreviewState.textContent='加载失败';
+      inlinePreviewState.style.background='#FFECE8';
+      inlinePreviewState.style.color='#F53F3F';
+      inlinePreviewPlaceholder.hidden=false;
+      inlinePreviewPlaceholder.innerHTML=`<div><b>预览暂时没有加载</b><span>${event.detail?.message||'请点击重新加载预览'}</span></div>`;
+    });
+    inlinePreviewPlayer.iframeElement?.addEventListener('load',()=>setTimeout(primeInlinePlayer,900));
+    document.getElementById('previewBtn').addEventListener('click',async()=>{
+      const btn=document.getElementById('previewBtn');
+      if(!inlinePreviewVideo.hidden&&inlinePreviewVideo.src) { inlinePreviewVideo.currentTime=0;void inlinePreviewVideo.play().catch(()=>{});return; }
+      btn.disabled=true;btn.textContent='正在重新加载…';
+      try { await loadInlinePreview(true);toast('预览已在右侧重新加载'); }
+      catch(err) { toast(err.message||'预览没有加载成功'); }
+      finally { btn.disabled=false;btn.textContent='重新加载预览'; }
+    });
+    document.getElementById('editorBtn').addEventListener('click',async()=>{
+      const editorWindow=window.open('about:blank','_blank');
+      const btn=document.getElementById('editorBtn');btn.disabled=true;btn.textContent='正在打开编辑器…';
+      try {
+        const res=await fetch('/api/preview',{method:'POST'}),data=await res.json();
+        if(!res.ok) throw new Error(data.error);
+        inlineEditorUrl=data.url||inlineEditorUrl;
+        if(editorWindow) editorWindow.location.replace(inlineEditorUrl);
+        else window.location.assign(inlineEditorUrl);
+      } catch(err) { if(editorWindow)editorWindow.close();toast(err.message||'编辑器没有打开'); }
+      finally { btn.disabled=false;btn.textContent='高级编辑'; }
+    });
+    renderBtn.addEventListener('click',async()=>{renderBtn.disabled=true;try{const res=await fetch('/api/render',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({approved:true})}),data=await res.json();if(!res.ok)throw new Error(data.error);toast('开始导出，请保持操作台打开');}catch(err){toast(err.message||'没有开始导出');renderBtn.disabled=false;} });
+    document.getElementById('demoClose').addEventListener('click',()=>document.getElementById('templateDialog').close());
+    document.getElementById('useTemplateBtn').addEventListener('click',()=>{selectTemplate(dialogTemplate);document.getElementById('templateDialog').close();toast('已选择这套模板');});
+    renderAgentWorkflow({phase:'idle'});loadTemplateLibrary();poll();
+  </script>
+</body>
+</html>
